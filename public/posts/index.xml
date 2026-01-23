@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Posts on SOBER</title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Posts on SOBER</description>
+    <generator>Hugo -- 0.152.2</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 23 Jan 2026 09:07:39 -0400</lastBuildDate>
+    <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hello Sober</title>
+      <link>http://localhost:1313/posts/hello-sober/</link>
+      <pubDate>Fri, 23 Jan 2026 09:07:39 -0400</pubDate>
+      <guid>http://localhost:1313/posts/hello-sober/</guid>
+      <description>&lt;p&gt;Herein lies the start of a great initiative, built one day at a time. Through Christ, the Son of God. Amen.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

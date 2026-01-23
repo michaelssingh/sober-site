@@ -1,0 +1,4 @@
+baseURL = 'https://sober.fyi/'
+languageCode = 'en-us'
+title = 'SOBER'
+theme = 'PaperMod'
