@@ -8,16 +8,30 @@ theme = 'PaperMod'
     description = "Elite DevOps & Platform Engineering. Stability through observability."
 
     [params.profileMode]
-    enabled = true
-    title = " " # Leave empty if the logo already says SOBER
-    subtitle = "Systems Oriented Business Engineering & Research. <br/> **Eliminating technical volatility.**"
-    imageUrl = "images/owl-mascot.svg"
-    imageWidth = 120
-    imageHeight = 120
+        enabled = true
+        title = " " 
+        subtitle = "Systems Oriented Business Engineering & Research. <br/> **Eliminating technical volatility.**"
+        imageUrl = "images/owl-mascot.svg"
+        imageWidth = 120
+        imageHeight = 120
+
+        # Note: socialIcons must be INSIDE profileMode to show up on the homepage
+        # [[params.profileMode.buttons]]
+        #     name = "Contact"
+        #     url = "mailto:michael@sober.fyi"
+
+        [[params.socialIcons]]
+            name = "linkedin"
+            url = "https://linkedin.com/in/michaelsingh" # Update with your actual handle
+        [[params.socialIcons]]
+            name = "email"
+            url = "mailto:michael@sober.fyi"
 
     [params.assets]
         disableHLJS = false
-        customCSS = ["static/css/tokyonight.css"]
+        # FIX 1: Hugo looks in 'static/' by default. 
+        # Referencing 'static/css/...' will break the link. Use 'css/...'
+        customCSS = ["css/tokyonight.css"]
 
     [[menu.main]]
         name = "Services"
@@ -27,3 +41,9 @@ theme = 'PaperMod'
         name = "Philosophy"
         url = "/philosophy"
         weight = 20
+    [[menu.main]]
+        name = "Resume"
+        # FIX 2: Hugo maps 'static/resume.pdf' to the root domain.
+        # Use '/resume.pdf' so it works on the live site.
+        url = "/resume" 
+        weight = 30
