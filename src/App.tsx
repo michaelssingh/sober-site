@@ -12,7 +12,15 @@ import {
   Moon,
   Search,
   Sparkles,
-  FileText
+  FileText,
+  X,
+  ArrowRight,
+  CheckCircle2,
+  Calendar,
+  Cloud,
+  Layers,
+  AlertTriangle,
+  Users
 } from 'lucide-react';
 import './App.css';
 
@@ -234,12 +242,24 @@ export default function App() {
   const [mascotQuote, setMascotQuote] = useState<string>(quotes[0]);
   const [quoteIndex, setQuoteIndex] = useState<number>(0);
   
+  // Lead Funnel Modal State
+  const [showFunnel, setShowFunnel] = useState<boolean>(false);
+  const [funnelStep, setFunnelStep] = useState<number>(1);
+  const [funnelData, setFunnelData] = useState({
+    cloudProvider: '',
+    monthlySpend: '',
+    bottleneck: '',
+    teamSize: '',
+    name: '',
+    email: '',
+    company: ''
+  });
+
   // Resume filters state
   const [skillSearch, setSkillSearch] = useState<string>('');
   const [skillCategory, setSkillCategory] = useState<string>('all');
 
   useEffect(() => {
-    // Initial theme set
     const root = document.documentElement;
     if (theme === 'dark') {
       root.classList.add('dark');
@@ -256,6 +276,30 @@ export default function App() {
     const nextIdx = (quoteIndex + 1) % quotes.length;
     setQuoteIndex(nextIdx);
     setMascotQuote(quotes[nextIdx]);
+  };
+
+  const startLeadFunnel = () => {
+    setFunnelStep(1);
+    setFunnelData({
+      cloudProvider: '',
+      monthlySpend: '',
+      bottleneck: '',
+      teamSize: '',
+      name: '',
+      email: '',
+      company: ''
+    });
+    setShowFunnel(true);
+  };
+
+  const handleFunnelOption = (field: string, value: string) => {
+    setFunnelData(prev => ({ ...prev, [field]: value }));
+    setFunnelStep(prev => prev + 1);
+  };
+
+  const handleFunnelSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFunnelStep(6); // Final custom recommendation step
   };
 
   // Filter skills based on tab and search query
@@ -298,6 +342,14 @@ export default function App() {
               Resume
             </button>
             
+            <button 
+              className="cta-btn cta-primary" 
+              style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+              onClick={startLeadFunnel}
+            >
+              Free SRE Audit
+            </button>
+
             <button className="theme-toggle-btn" onClick={toggleTheme} aria-label="Toggle dark mode">
               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -321,11 +373,11 @@ export default function App() {
                 <h1 className="hero-title">Your Entire Cloud Stack.<br/><span className="gradient-text">Deployed in 24 Hours.</span></h1>
                 <p className="hero-subtitle">We build, deploy, and maintain secure, SOC2-ready, fully observable infrastructure directly in your AWS, GCP, or Fly.io account. Stop building VPCs; start shipping product.</p>
                 <div className="hero-ctas">
-                  <button className="cta-btn cta-primary" onClick={() => setView('services')}>
-                    Explore Subscriptions <ChevronRight size={16} />
+                  <button className="cta-btn cta-primary" onClick={startLeadFunnel}>
+                    Start Free Infrastructure Audit <ChevronRight size={16} />
                   </button>
-                  <button className="cta-btn cta-secondary" onClick={() => setView('philosophy')}>
-                    Read Our Philosophy
+                  <button className="cta-btn cta-secondary" onClick={() => setView('services')}>
+                    Explore Pricing & Subscriptions
                   </button>
                 </div>
               </div>
@@ -447,7 +499,7 @@ export default function App() {
                   <li>GitHub Actions / GitOps CI/CD templates</li>
                   <li>30 days of post-launch SRE handoff support</li>
                 </ul>
-                <a href="mailto:michael@sober.fyi" className="cta-btn cta-secondary" style={{ marginTop: '25px', textAlign: 'center', display: 'block' }}>Get Started</a>
+                <button className="cta-btn cta-secondary" style={{ marginTop: '25px', width: '100%', justifyContent: 'center' }} onClick={startLeadFunnel}>Get Started</button>
               </div>
 
               <div className="bento-card" style={{ borderTop: '4px solid var(--accent-magenta)', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(187, 154, 247, 0.15)' }}>
@@ -462,7 +514,7 @@ export default function App() {
                   <li>Dedicated Slack channel with senior SOBER architects</li>
                   <li>2-hour urgent SLA response time</li>
                 </ul>
-                <a href="mailto:michael@sober.fyi" className="cta-btn cta-primary" style={{ marginTop: '25px', textAlign: 'center', display: 'block' }}>Subscribe Now</a>
+                <button className="cta-btn cta-primary" style={{ marginTop: '25px', width: '100%', justifyContent: 'center' }} onClick={startLeadFunnel}>Subscribe Now</button>
               </div>
             </div>
           </div>
@@ -643,6 +695,306 @@ export default function App() {
         )}
 
       </main>
+
+      {/* ==========================================
+         CPA LEAD FUNNEL MODAL
+         ========================================== */}
+      {showFunnel && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(26, 27, 38, 0.85)',
+          zIndex: 10000,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '20px',
+          backdropFilter: 'blur(8px)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: 'var(--entry)',
+            border: '1.5px solid var(--border)',
+            borderRadius: '16px',
+            width: '100%',
+            maxWidth: '560px',
+            boxShadow: 'var(--shadow-md)',
+            position: 'relative',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* Modal Header */}
+            <div style={{
+              padding: '20px 24px',
+              borderBottom: '1px solid var(--border)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <h3 style={{ fontSize: '1.25rem', margin: 0 }}>Free Cloud Assessment</h3>
+              <button 
+                onClick={() => setShowFunnel(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--content)', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Funnel Content */}
+            <div style={{ padding: '24px', maxHeight: '75vh', overflowY: 'auto' }}>
+              
+              {/* Step 1: Cloud Provider */}
+              {funnelStep === 1 && (
+                <div className="fade-in">
+                  <span className="badge badge-blue">Step 1 of 5</span>
+                  <h3 style={{ marginBottom: '15px' }}>Which cloud provider does your startup use?</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <button 
+                      onClick={() => handleFunnelOption('cloudProvider', 'AWS')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <Cloud size={16} /> AWS (Amazon Web Services)
+                    </button>
+                    <button 
+                      onClick={() => handleFunnelOption('cloudProvider', 'GCP')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <Cloud size={16} /> GCP (Google Cloud Platform)
+                    </button>
+                    <button 
+                      onClick={() => handleFunnelOption('cloudProvider', 'Fly.io')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <Layers size={16} /> Fly.io / MicroVMs
+                    </button>
+                    <button 
+                      onClick={() => handleFunnelOption('cloudProvider', 'Multi-Cloud')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <Layers size={16} /> Multi-Cloud Topology
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Monthly Spend */}
+              {funnelStep === 2 && (
+                <div className="fade-in">
+                  <span className="badge badge-magenta">Step 2 of 5</span>
+                  <h3 style={{ marginBottom: '15px' }}>What is your estimated monthly hosting spend?</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <button 
+                      onClick={() => handleFunnelOption('monthlySpend', '< $5,000')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold' }}
+                    >
+                      Under $5,000 / mo
+                    </button>
+                    <button 
+                      onClick={() => handleFunnelOption('monthlySpend', '$5,000 - $20,000')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold' }}
+                    >
+                      $5,000 to $20,000 / mo
+                    </button>
+                    <button 
+                      onClick={() => handleFunnelOption('monthlySpend', '$20,000 - $100,000')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold' }}
+                    >
+                      $20,000 to $100,000 / mo
+                    </button>
+                    <button 
+                      onClick={() => handleFunnelOption('monthlySpend', '$100,000+')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold' }}
+                    >
+                      Over $100,000 / mo
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Main Challenge */}
+              {funnelStep === 3 && (
+                <div className="fade-in">
+                  <span className="badge badge-teal">Step 3 of 5</span>
+                  <h3 style={{ marginBottom: '15px' }}>What is your primary infrastructure bottleneck?</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <button 
+                      onClick={() => handleFunnelOption('bottleneck', 'Compliance (SOC2/ISO)')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <ShieldCheck size={16} /> Preparing for compliance audit (SOC2/ISO)
+                    </button>
+                    <button 
+                      onClick={() => handleFunnelOption('bottleneck', 'High Hosting Costs')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <AlertTriangle size={16} /> Excessive cloud bills / FinOps optimization
+                    </button>
+                    <button 
+                      onClick={() => handleFunnelOption('bottleneck', 'Slow Developer Onboarding')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <Terminal size={16} /> Slow workspace onboarding (Nix environments)
+                    </button>
+                    <button 
+                      onClick={() => handleFunnelOption('bottleneck', 'Unstable Deployments')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <Cpu size={16} /> Unstable / flaky deployments or configuration drift
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 4: Team Scale */}
+              {funnelStep === 4 && (
+                <div className="fade-in">
+                  <span className="badge badge-green">Step 4 of 5</span>
+                  <h3 style={{ marginBottom: '15px' }}>How many engineers are in your team?</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <button 
+                      onClick={() => handleFunnelOption('teamSize', '1 - 5')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <Users size={16} /> 1 to 5 developers
+                    </button>
+                    <button 
+                      onClick={() => handleFunnelOption('teamSize', '6 - 20')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <Users size={16} /> 6 to 20 developers
+                    </button>
+                    <button 
+                      onClick={() => handleFunnelOption('teamSize', '21 - 100')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <Users size={16} /> 21 to 100 developers
+                    </button>
+                    <button 
+                      onClick={() => handleFunnelOption('teamSize', '100+')}
+                      style={{ padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--theme)', color: 'var(--primary)', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <Users size={16} /> Over 100 developers
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 5: Contact Details */}
+              {funnelStep === 5 && (
+                <form onSubmit={handleFunnelSubmit} className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  <span className="badge badge-blue">Step 5 of 5</span>
+                  <h3>Get Your Custom SOBER Stack Proposal</h3>
+                  <p style={{ color: 'var(--tertiary)', fontSize: '0.9rem' }}>Fill in your details below. SOBER will calculate your savings and prepare an architecture blueprint based on your parameters.</p>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>Name</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="Michael Singh"
+                      className="search-input" 
+                      value={funnelData.name}
+                      onChange={(e) => setFunnelData(prev => ({ ...prev, name: e.target.value }))}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>Company Web URL</label>
+                    <input 
+                      type="url" 
+                      required
+                      placeholder="https://sober.fyi" 
+                      className="search-input"
+                      value={funnelData.company}
+                      onChange={(e) => setFunnelData(prev => ({ ...prev, company: e.target.value }))}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>Work Email</label>
+                    <input 
+                      type="email" 
+                      required
+                      placeholder="michael@sober.fyi" 
+                      className="search-input"
+                      value={funnelData.email}
+                      onChange={(e) => setFunnelData(prev => ({ ...prev, email: e.target.value }))}
+                    />
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    className="cta-btn cta-primary" 
+                    style={{ marginTop: '15px', justifyContent: 'center' }}
+                  >
+                    Generate SOBER Proposal <ArrowRight size={16} />
+                  </button>
+                </form>
+              )}
+
+              {/* Step 6: Custom Proposal (funnel completed) */}
+              {funnelStep === 6 && (
+                <div className="fade-in" style={{ textAlign: 'center' }}>
+                  <CheckCircle2 size={48} style={{ color: 'var(--accent-green)', marginBottom: '15px' }} />
+                  <h2>Assessment Completed!</h2>
+                  <p style={{ color: 'var(--tertiary)', marginBottom: '24px' }}>Hey {funnelData.name}, we've generated a custom blueprint for {funnelData.company.replace('https://', '')}.</p>
+
+                  <div style={{
+                    background: 'var(--theme)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '10px',
+                    padding: '20px',
+                    textAlign: 'left',
+                    marginBottom: '25px',
+                    fontSize: '0.92rem'
+                  }}>
+                    <h4 style={{ color: 'var(--primary)', marginBottom: '10px' }}>Your Customized Recommendation:</h4>
+                    <p style={{ marginBottom: '12px' }}>✔ <strong>Architecture Target:</strong> Deployed as a secure, SOC2-ready <strong>{funnelData.cloudProvider} Reference Architecture</strong>.</p>
+                    {funnelData.bottleneck.includes('Compliance') && (
+                      <p style={{ marginBottom: '12px' }}>✔ <strong>Compliance Focus:</strong> Pre-configured Vault secrets, KMS storage encryption, and IAM minimum-privilege audit logging to clear compliance audits immediately.</p>
+                    )}
+                    {funnelData.bottleneck.includes('Costs') && (
+                      <p style={{ marginBottom: '12px' }}>✔ <strong>FinOps Focus:</strong> AWS budget alerts, Fargate CPU autoscaling, and remote building on flycast to reduce monthly cloud spend (Estimated saving: ~25% off your {funnelData.monthlySpend} bill).</p>
+                    )}
+                    {funnelData.bottleneck.includes('Onboarding') && (
+                      <p style={{ marginBottom: '12px' }}>✔ <strong>Developer Onboarding:</strong> Standardized Nix Shell environment configurations. New developers will boot their workspaces in under 2 minutes.</p>
+                    )}
+                    <p>✔ <strong>Action Plan:</strong> Scale Subscription ($2,450/month) for continuous PR upgrades, library modules, and Slack support.</p>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <a 
+                      href="mailto:michael@sober.fyi?subject=SOBER Stack Review"
+                      className="cta-btn cta-primary" 
+                      style={{ justifyContent: 'center' }}
+                      onClick={() => setShowFunnel(false)}
+                    >
+                      <Calendar size={16} /> Book 15-Min SRE consultation
+                    </a>
+                    <button 
+                      onClick={() => setShowFunnel(false)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--tertiary)',
+                        cursor: 'pointer',
+                        fontSize: '0.85rem'
+                      }}
+                    >
+                      Return to Homepage
+                    </button>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ==========================================
          FOOTER
