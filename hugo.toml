@@ -2,23 +2,36 @@ baseURL = 'https://sober.fyi'
 languageCode = 'en-us'
 title = 'SOBER'
 theme = 'PaperMod'
+ignoreLogs = ['warning-goldmark-raw-html']
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
 
 [params]
     env = "production"
     description = "Elite DevOps & Platform Engineering. Stability through observability."
+    defaultTheme = "dark"
+
+    [params.author]
+        name = "Michael Singh"
+        email = "michael@sober.fyi"
 
     [params.profileMode]
         enabled = true
-        title = " " 
-        subtitle = "Systems Oriented Business Engineering & Research. <br/> **Eliminating technical volatility.**"
+        title = "SOBER"
+        subtitle = "Production-grade, security-hardened Reference Architectures and infrastructure subscriptions.<br/>**Eliminating technical volatility.**"
         imageUrl = "images/owl-mascot.svg"
         imageWidth = 120
         imageHeight = 120
 
-        # Note: socialIcons must be INSIDE profileMode to show up on the homepage
-        # [[params.profileMode.buttons]]
-        #     name = "Contact"
-        #     url = "mailto:michael@sober.fyi"
+        [[params.profileMode.buttons]]
+            name = "View Subscriptions & Services"
+            url = "/services"
+        [[params.profileMode.buttons]]
+            name = "Our Philosophy"
+            url = "/philosophy"
 
         [[params.socialIcons]]
             name = "linkedin"

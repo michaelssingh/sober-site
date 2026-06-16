@@ -1,69 +1,340 @@
-/* 1. Global Variables & Base Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ==========================================
+   1. Design System Tokens (Tokyo Night Storm)
+   ========================================== */
+
+/* Light Mode: Tokyo Night Day */
 :root {
-    --theme: #1a1b26;
+    --theme: #f5f5f5;
+    --entry: #ffffff;
+    --primary: #3760bf;
+    --secondary: #587539;
+    --tertiary: #848cb5;
+    --content: #383a42;
+    --code-block-bg: #e1e2e7;
+    --code-bg: #e1e2e7;
+    --border: #cbd2e0;
+    --accent-blue: #2e7de9;
+    --accent-magenta: #9854f1;
+    --accent-teal: #007197;
+    --accent-green: #4f8004;
+    color-scheme: light;
+}
+
+/* Dark Mode: Tokyo Night Storm */
+:root[data-theme="dark"] {
+    --theme: #24283b;
+    --entry: #1f2335;
     --primary: #c0caf5;
     --secondary: #9ece6a;
-    --tertiary: #7aa2f7;
+    --tertiary: #565f89;
     --content: #a9b1d6;
+    --code-block-bg: #1a1b26;
+    --code-bg: #1a1b26;
+    --border: #3b4261;
+    --accent-blue: #7aa2f7;
+    --accent-magenta: #bb9af7;
+    --accent-teal: #7dcfff;
+    --accent-green: #9ece6a;
+    color-scheme: dark;
 }
 
-body { 
-    background: var(--theme) !important; 
-    color: var(--primary); 
+/* ==========================================
+   2. Base Styles & Global Customizations
+   ========================================== */
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    background: var(--theme) !important;
+    color: var(--content) !important;
+    line-height: 1.6;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
-h1, h2, h3 { 
-    color: #bb9af7 !important; 
+/* Page fade-in animation */
+.main {
+    animation: fadeIn 0.6s ease-out;
 }
 
-a { 
-    color: var(--tertiary); 
-    text-decoration: none; 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* 2. Global Profile Adjustments (Desktop & Mobile) */
+/* Typography & Gradient Headers */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--primary) !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em;
+}
+
+h1.post-title,
+.first-entry .entry-header h1,
+.profile_inner h1 {
+    background: linear-gradient(135deg, var(--accent-magenta) 0%, var(--accent-blue) 60%, var(--accent-teal) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+}
+
+a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--accent-magenta);
+}
+
+/* ==========================================
+   3. Header Navigation (Glassmorphic)
+   ========================================== */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    background: rgba(36, 40, 59, 0.75) !important;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+:root[data-theme="light"] .header {
+    background: rgba(245, 245, 245, 0.75) !important;
+}
+
+.nav {
+    max-width: var(--nav-width);
+    margin: 0 auto;
+    padding: 10px 20px;
+}
+
+.logo a {
+    font-weight: 700 !important;
+    font-size: 1.4rem;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--accent-magenta) 0%, var(--accent-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Active menu indicator */
+.menu a {
+    font-weight: 500;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.menu a:hover {
+    color: var(--accent-magenta) !important;
+    transform: translateY(-1px);
+}
+
+/* ==========================================
+   4. Profile & Mascot Layout
+   ========================================== */
+.profile_inner {
+    padding: 50px 20px !important;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); }
+}
+
 .profile_inner img {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    animation: float 6s ease-in-out infinite;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
 }
 
-/* 3. Mobile-Specific Overrides (The "Very Bad" Fix) */
+.profile_inner img:hover {
+    transform: scale(1.08) rotate(2deg);
+    filter: drop-shadow(0 0 25px rgba(187, 154, 247, 0.4));
+}
+
+.profile_inner .subtitle {
+    font-size: 1.25rem !important;
+    color: var(--content);
+    max-width: 600px;
+    margin: 20px auto 0 auto;
+}
+
+/* ==========================================
+   5. Card Layout (Posts & Entries)
+   ========================================== */
+.post-entry {
+    background: var(--entry) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-radius: 12px !important;
+    margin-bottom: 24px !important;
+    padding: 24px !important;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+}
+
+.post-entry:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+    border-color: var(--accent-blue) !important;
+}
+
+.entry-header h2 {
+    font-size: 1.5rem !important;
+    margin-bottom: 8px;
+    transition: color 0.2s ease;
+}
+
+.post-entry:hover .entry-header h2 {
+    color: var(--accent-blue) !important;
+}
+
+/* ==========================================
+   6. Premium CV/Resume Enhancements
+   ========================================== */
+.resume-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.resume-header h1 {
+    margin-bottom: 5px;
+}
+
+.resume-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+}
+
+.resume-section {
+    background: var(--entry);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.resume-section h2 {
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+    font-size: 1.4rem !important;
+}
+
+/* Modern Tag pill formatting for competencies */
+.competencies-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.competency-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.competency-group strong {
+    color: var(--primary);
+    font-size: 0.95rem;
+}
+
+.competency-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.competency-tags span {
+    background: var(--theme);
+    color: var(--content);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.85rem;
+    font-family: monospace;
+    font-weight: 500;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.competency-tags span:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-blue);
+    background: rgba(122, 162, 247, 0.08);
+}
+
+/* Timeline Experience Cards */
+.experience-item {
+    margin-bottom: 25px;
+    padding-left: 15px;
+    border-left: 3px solid var(--accent-blue);
+}
+
+.experience-item:last-child {
+    margin-bottom: 0;
+}
+
+.experience-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
+}
+
+.experience-title h3 {
+    font-size: 1.15rem !important;
+    margin: 0 !important;
+}
+
+.experience-company {
+    color: var(--accent-magenta);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.experience-date {
+    font-size: 0.85rem;
+    color: var(--tertiary);
+    font-family: monospace;
+}
+
+/* ==========================================
+   7. Mobile Responsive Adjustments
+   ========================================== */
 @media screen and (max-width: 768px) {
-    /* Hide the giant redundant top header text */
-    .logo {
-        display: none !important;
+    .nav {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
     }
 
-    /* Pull everything up so it fits on one screen */
-    .nav {
-        justify-content: center;
-        padding: 5px 0;
+    .logo {
+        margin-bottom: 5px;
     }
 
     .profile_inner {
-        padding: 20px 10px !important;
-        margin-top: 0 !important;
+        padding: 30px 10px !important;
     }
 
-    /* Shrink Mascot for mobile viewport */
     .profile_inner img {
         width: 100px !important;
-        margin-bottom: 10px;
     }
 
-    /* Clean up the tagline text */
     .profile_inner .subtitle {
         font-size: 1.1rem !important;
-        line-height: 1.4;
-        padding: 0 15px;
-        white-space: normal !important;
     }
 
-    /* Center the theme toggle/social icons */
-    .social-icons, .theme-toggle {
-        display: flex;
-        justify-content: center;
-        margin-top: 15px;
+    .experience-title {
+        flex-direction: column;
+        gap: 2px;
     }
 }
