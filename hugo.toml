@@ -19,7 +19,7 @@ ignoreLogs = ['warning-goldmark-raw-html']
         email = "michael@sober.fyi"
 
     [params.profileMode]
-        enabled = true
+        enabled = false
         title = "SOBER"
         subtitle = "We deploy and maintain your cloud infrastructure so your team can focus on shipping product.<br/>**Platform engineering on autopilot.**"
         imageUrl = "images/owl-mascot.svg"
