@@ -21,7 +21,7 @@ ignoreLogs = ['warning-goldmark-raw-html']
     [params.profileMode]
         enabled = true
         title = "SOBER"
-        subtitle = "Production-grade, security-hardened Reference Architectures and infrastructure subscriptions.<br/>**Eliminating technical volatility.**"
+        subtitle = "We deploy and maintain your cloud infrastructure so your team can focus on shipping product.<br/>**Platform engineering on autopilot.**"
         imageUrl = "images/owl-mascot.svg"
         imageWidth = 120
         imageHeight = 120
