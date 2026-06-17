@@ -18,8 +18,7 @@ app.use(express.static(path.join(__dirname, 'dist')));
 // Mock API from backend/index.ts
 const iacModules = [
   { id: 'vpc', name: 'AWS VPC', category: 'Networking', description: 'Production-grade VPC with public/private subnets and NAT Gateways.' },
-  { id: 'eks', name: 'AWS EKS', category: 'Compute', description: 'Managed Kubernetes Cluster with OIDC, IRSA, and autoscaling node groups.' },
-  { id: 'sober-edge-runtime', name: 'SoberEdge Runtime', category: 'Serverless', description: 'The eBPF-enabled WASM runtime for high-performance functions.' }
+  { id: 'eks', name: 'AWS EKS', category: 'Compute', description: 'Managed Kubernetes Cluster with OIDC, IRSA, and autoscaling node groups.' }
 ];
 
 let deployments = [

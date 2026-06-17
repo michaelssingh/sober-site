@@ -27,7 +27,7 @@ resource "aws_eks_cluster" "main" {
   }
 
   tags = {
-    ManagedBy = "SoberEdge"
+    ManagedBy = "SOBER"
   }
 }
 
