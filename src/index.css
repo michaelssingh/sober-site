@@ -1,26 +1,44 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:ital,wght@0,300..700;1,300..700&family=Syne:wght@400..800&display=swap');
 
 :root {
-  --theme: #020617;
-  --sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --mono: 'JetBrains Mono', monospace;
+  /* Tokyo Night Storm Palette */
+  --bg-storm: #24283b;
+  --bg-storm-dark: #1f2335;
+  --bg-storm-darker: #1a1b26;
+  
+  --fg-storm: #c0caf5;
+  --fg-storm-dark: #a9b1d6;
+  --fg-storm-gutter: #3b4261;
+
+  --accent-cyan: #7dcfff;
+  --accent-blue: #7aa2f7;
+  --accent-magenta: #bb9af7;
+  --accent-green: #9ece6a;
+  --accent-yellow: #e0af68;
+  --accent-red: #f7768e;
+  --accent-orange: #ff9e64;
+
+  --sans: 'Syne', system-ui, -apple-system, sans-serif;
+  --mono: 'Space Grotesk', monospace;
 }
 
 body {
   font-family: var(--sans);
-  background-color: var(--theme);
+  background-color: var(--bg-storm);
+  color: var(--fg-storm);
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Noise Texture Overlay */
+/* Noise Texture Overlay - Adjusted for Tokyo Night */
 .bg-noise {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.04;
   pointer-events: none;
+  mix-blend-mode: overlay;
 }
 
 @keyframes gradient {
@@ -31,7 +49,7 @@ body {
 
 .animate-gradient {
   background-size: 200% 200%;
-  animation: gradient 8s ease infinite;
+  animation: gradient 12s ease infinite;
 }
 
 @keyframes spin-slow {
@@ -42,18 +60,19 @@ body {
 /* Scanline Effect */
 .scanline {
   width: 100%;
-  height: 100px;
+  height: 150px;
   z-index: 10;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(0, 0, 0, 0) 100%);
-  opacity: 0.1;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(122, 162, 247, 0.05) 50%, rgba(0, 0, 0, 0) 100%);
+  opacity: 0.5;
   position: absolute;
   bottom: 100%;
-  animation: scanline 6s linear infinite;
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
 }
 
 @keyframes scanline {
   0% { bottom: 100%; }
-  100% { bottom: -100px; }
+  100% { bottom: -150px; }
 }
 
 @keyframes flicker {
@@ -75,12 +94,27 @@ body {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: var(--bg-storm-darker);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: var(--fg-storm-gutter);
   border-radius: 5px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: var(--accent-blue);
 }
+
+/* Custom Utilities for Tokyo Night */
+.text-tokyo-cyan { color: var(--accent-cyan); }
+.text-tokyo-blue { color: var(--accent-blue); }
+.text-tokyo-magenta { color: var(--accent-magenta); }
+.text-tokyo-green { color: var(--accent-green); }
+.text-tokyo-yellow { color: var(--accent-yellow); }
+.text-tokyo-red { color: var(--accent-red); }
+.text-tokyo-orange { color: var(--accent-orange); }
+
+.bg-tokyo-storm { background-color: var(--bg-storm); }
+.bg-tokyo-storm-dark { background-color: var(--bg-storm-dark); }
+.bg-tokyo-storm-darker { background-color: var(--bg-storm-darker); }
+
+.border-tokyo-gutter { border-color: var(--fg-storm-gutter); }
