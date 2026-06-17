@@ -24,6 +24,9 @@ import {
 } from 'lucide-react';
 import './App.css';
 
+import Dashboard from './Dashboard';
+import SoberEdge from './SoberEdge';
+
 // ==========================================
 // 1. Data Structure Definitions
 // ==========================================
@@ -237,7 +240,7 @@ const CostCalculator: React.FC = () => {
 // 4. App Main Component
 // ==========================================
 export default function App() {
-  const [view, setView] = useState<'home' | 'services' | 'philosophy' | 'resume'>('home');
+  const [view, setView] = useState<'home' | 'services' | 'philosophy' | 'resume' | 'platform' | 'edge'>('home');
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [mascotQuote, setMascotQuote] = useState<string>(quotes[0]);
   const [quoteIndex, setQuoteIndex] = useState<number>(0);
@@ -340,6 +343,20 @@ export default function App() {
               onClick={() => setView('resume')}
             >
               Resume
+            </button>
+            <button 
+              className={`nav-link ${view === 'platform' ? 'active' : ''}`} 
+              onClick={() => setView('platform')}
+              style={{ color: 'var(--accent-blue)', fontWeight: 'bold' }}
+            >
+              Platform Demo
+            </button>
+            <button 
+              className={`nav-link ${view === 'edge' ? 'active' : ''}`} 
+              onClick={() => setView('edge')}
+              style={{ color: 'var(--accent-magenta)', fontWeight: 'bold' }}
+            >
+              SoberEdge
             </button>
             
             <button 
@@ -488,6 +505,15 @@ export default function App() {
             <p style={{ textAlign: 'center', color: 'var(--tertiary)', marginBottom: '40px' }}>Fair, transparent pricing for teams of all sizes.</p>
 
             <div className="bento-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+              <div className="bento-card" style={{ borderTop: '4px solid var(--accent-blue)', display: 'flex', flexDirection: 'column' }}>
+                <span className="badge badge-blue">New Product</span>
+                <h3 style={{ margin: '5px 0' }}>SoberEdge: eBPF FaaS</h3>
+                <p style={{ fontSize: '0.95rem', margin: '10px 0' }}>Next-generation WebAssembly runtime with kernel-level observability. Zero cold starts, global scale.</p>
+                <div style={{ marginTop: 'auto' }}>
+                   <button onClick={() => setView('edge')} className="cta-btn cta-secondary" style={{ width: '100%', justifyContent: 'center' }}>Explore SoberEdge →</button>
+                </div>
+              </div>
+
               <div className="bento-card" style={{ borderTop: '4px solid var(--accent-blue)', display: 'flex', flexDirection: 'column' }}>
                 <span className="badge badge-blue">For Early Stage</span>
                 <h3 style={{ margin: '5px 0' }}>Reference Boot</h3>
@@ -691,6 +717,18 @@ export default function App() {
                 <FileText size={18} /> Download Full Resume (PDF)
               </a>
             </div>
+          </div>
+        )}
+
+        {view === 'platform' && (
+          <div className="fade-in" style={{ height: 'calc(100vh - 80px)' }}>
+            <Dashboard />
+          </div>
+        )}
+
+        {view === 'edge' && (
+          <div className="fade-in">
+            <SoberEdge onBack={() => setView('home')} />
           </div>
         )}
 

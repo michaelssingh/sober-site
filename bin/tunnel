@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+# --- Sprite Tunnel Manager ---
+# Optimized for Otus -> Agy (SOBER Site Development)
+# Starts and stops SOCKS5, SSH agent forwarding, and local dev port forwarding.
+
+set -euo pipefail
+
+SPRITE_NAME="agy"
+SOCKS_PORT=1080
+AGENT_PORT=9000
+SSH_PORT=2222
+SPRITE_BIN="/.sprite/bin/sprite"
+
+PID_DIR="$HOME/.cache/sprite-tunnel"
+mkdir -p "$PID_DIR"
+
+SOCKS_PID_FILE="$PID_DIR/socks.pid"
+SOCAT_PID_FILE="$PID_DIR/socat.pid"
+PROXY_PID_FILE="$PID_DIR/proxy.pid"
+SSH_PID_FILE="$PID_DIR/ssh.pid"
+
+check_running() {
+    local pid_file="$1"
+    if [ -f "$pid_file" ]; then
+        local pid
+        pid=$(cat "$pid_file")
+        if kill -0 "$pid" 2>/dev/null; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
+stop_process() {
+    local name="$1"
+    local pid_file="$2"
+    if check_running "$pid_file"; then
+        local pid
+        pid=$(cat "$pid_file")
+        echo "Stopping $name (PID $pid)..."
+        kill "$pid" 2>/dev/null || true
+        for i in {1..30}; do
+            if ! kill -0 "$pid" 2>/dev/null; then
+                break
+            fi
+            sleep 0.1
+        done
+        if kill -0 "$pid" 2>/dev/null; then
+            kill -9 "$pid" 2>/dev/null || true
+        fi
+        rm -f "$pid_file"
+    else
+        rm -f "$pid_file"
+    fi
+}
+
+ensure_remote_services() {
+    echo "Checking remote VM ($SPRITE_NAME) services..."
+
+    # 1. Ensure nix-daemon is running
+    if ! $SPRITE_BIN exec -s "$SPRITE_NAME" -- pgrep -f nix-daemon >/dev/null 2>&1; then
+        echo "  - Starting nix-daemon on remote VM..."
+        $SPRITE_BIN exec -s "$SPRITE_NAME" -- sh -c "sudo /nix/var/nix/profiles/default/bin/nix-daemon 2>/tmp/nix-daemon.log &"
+        sleep 2
+    else
+        echo "  - nix-daemon is already running"
+    fi
+
+    # 2. Ensure SSH daemon is running
+    if ! $SPRITE_BIN exec -s "$SPRITE_NAME" -- ss -tlnp 2>/dev/null | grep -q ":$SSH_PORT "; then
+        echo "  - Starting SSH daemon on remote VM..."
+        $SPRITE_BIN exec -s "$SPRITE_NAME" -- sudo mkdir -p /run/sshd
+        $SPRITE_BIN exec -s "$SPRITE_NAME" -- sudo /usr/sbin/sshd -f /home/sprite/sshd_config
+    else
+        echo "  - SSH daemon is already running on port $SSH_PORT"
+    fi
+
+    # 3. Ensure SSH agent socat bridge
+    if ! $SPRITE_BIN exec -s "$SPRITE_NAME" -- pgrep -f "socat UNIX-LISTEN:/home/sprite/.ssh-agent.sock" >/dev/null 2>&1; then
+        echo "  - Starting socat SSH agent bridge on remote VM..."
+        $SPRITE_BIN exec -s "$SPRITE_NAME" -- sh -c "rm -f /home/sprite/.ssh-agent.sock && nohup socat UNIX-LISTEN:/home/sprite/.ssh-agent.sock,fork TCP:127.0.0.1:$AGENT_PORT >/tmp/socat-agent.log 2>&1 &"
+    else
+        echo "  - SSH agent socat bridge is already running"
+    fi
+}
+
+start_tunnel() {
+    ensure_remote_services
+    stop_all
+
+    echo "Starting SOCKS5 proxy on port $SOCKS_PORT..."
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    nohup python3 "$SCRIPT_DIR/socks5-proxy.py" "$SOCKS_PORT" > "$PID_DIR/socks.log" 2>&1 & disown
+    echo $! > "$SOCKS_PID_FILE"
+
+    echo "Starting local SSH agent forwarder on port $AGENT_PORT..."
+    if [ -z "${SSH_AUTH_SOCK:-}" ]; then
+        echo "Error: SSH_AUTH_SOCK is not set." >&2
+        exit 1
+    fi
+    nohup socat TCP-LISTEN:"$AGENT_PORT",bind=127.0.0.1,reuseaddr,fork UNIX-CONNECT:"$SSH_AUTH_SOCK" > "$PID_DIR/socat.log" 2>&1 & disown
+    echo $! > "$SOCAT_PID_FILE"
+
+    echo "Establishing sprite proxy for port $SSH_PORT..."
+    nohup $SPRITE_BIN proxy -s "$SPRITE_NAME" "$SSH_PORT" > "$PID_DIR/proxy.log" 2>&1 & disown
+    echo $! > "$PROXY_PID_FILE"
+
+    echo "Waiting for sprite proxy to bind..."
+    for i in {1..50}; do
+        if ss -tlnp 2>/dev/null | grep -q ":$SSH_PORT "; then
+            break
+        fi
+        sleep 0.1
+    done
+
+    echo "Establishing SSH reverse tunnel..."
+    nohup ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+        -p "$SSH_PORT" \
+        -L 5173:127.0.0.1:5173 \
+        -L 4000:127.0.0.1:4000 \
+        -R "$SOCKS_PORT:127.0.0.1:$SOCKS_PORT" \
+        -R "$AGENT_PORT:127.0.0.1:$AGENT_PORT" \
+        -R "2223:127.0.0.1:22" \
+        -N sprite@127.0.0.1 > "$PID_DIR/ssh.log" 2>&1 & disown
+    echo $! > "$SSH_PID_FILE"
+
+    echo "✓ Sprite tunnel established!"
+    echo "  - Frontend: http://localhost:5173"
+    echo "  - Backend:  http://localhost:4000"
+}
+
+stop_all() {
+    stop_process "SSH reverse tunnel" "$SSH_PID_FILE"
+    stop_process "sprite proxy" "$PROXY_PID_FILE"
+    stop_process "local SSH agent forwarder" "$SOCAT_PID_FILE"
+    stop_process "SOCKS5 proxy" "$SOCKS_PID_FILE"
+}
+
+status_tunnel() {
+    local all_ok=0
+    
+    check_running "$SOCKS_PID_FILE" && echo "✓ SOCKS5 running" || { echo "✗ SOCKS5 stopped"; all_ok=1; }
+    check_running "$SOCAT_PID_FILE" && echo "✓ Agent forwarder running" || { echo "✗ Agent forwarder stopped"; all_ok=1; }
+    check_running "$PROXY_PID_FILE" && echo "✓ Proxy running" || { echo "✗ Proxy stopped"; all_ok=1; }
+    check_running "$SSH_PID_FILE" && echo "✓ SSH tunnel running" || { echo "✗ SSH tunnel stopped"; all_ok=1; }
+
+    # Remote check
+    local list_output
+    if list_output=$($SPRITE_BIN list 2>/dev/null); then
+        if echo "$list_output" | grep -q "$SPRITE_NAME.*running"; then
+            echo "✓ Remote VM ($SPRITE_NAME) is running"
+        else
+            echo "✗ Remote VM ($SPRITE_NAME) is NOT running"
+            all_ok=1
+        fi
+    fi
+    return "$all_ok"
+}
+
+case "${1:-}" in
+    start) start_tunnel ;;
+    stop) stop_all ;;
+    restart) start_tunnel ;;
+    status) status_tunnel ;;
+    *) echo "Usage: $0 {start|stop|restart|status}"; exit 1 ;;
+esac
